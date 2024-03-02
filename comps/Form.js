@@ -196,7 +196,7 @@ const Form = () => {
                         }
                     </div>
 
-                    <button type='submit' className='bg-black text-white p-2 px-5 rounded-lg mt-3'>Submit</button>
+                    <button type='submit' className='bg-black text-white p-2 px-5 rounded-lg mt-3'>ارسال</button>
                 </form >
 
                 <div className='mt-7'>

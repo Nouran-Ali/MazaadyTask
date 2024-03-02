@@ -18,7 +18,7 @@ export const ProductsSection = () => {
         },
         {
             id: '2',
-            src: "/../products/1.png",
+            src: "/../products/2.png",
             title: 'Six-piece clothing set (blouse - pants - hat and ...',
             price: "1000 EGP",
             days: "2",
@@ -29,7 +29,7 @@ export const ProductsSection = () => {
         },
         {
             id: '3',
-            src: "/../products/1.png",
+            src: "/../products/3.png",
             title: 'Jeep Car, new, used for only one time',
             price: "1000 EGP",
             days: "2",
@@ -40,7 +40,7 @@ export const ProductsSection = () => {
         },
         {
             id: '4',
-            src: "/../products/1.png",
+            src: "/../products/4.png",
             title: 'Six-piece clothing set (blouse - pants - hat and ...',
             price: "1000 EGP",
             days: "2",
