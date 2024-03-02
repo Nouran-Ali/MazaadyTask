@@ -72,7 +72,7 @@ export const ProductsSection = () => {
             favorite: false,
         },
     ];
-    
+
     const mediaQuery = window.matchMedia('(max-width: 1280px)');
 
     return (
@@ -84,7 +84,7 @@ export const ProductsSection = () => {
                     <div className="flex justify-between max-xl:relative mt-8" key={id}>
                         <div className="flex items-center max-xl:justify-between max-xl:items-start">
                             <div className="xl:relative">
-                                <img src={src} width={mediaQuery.matches ? 180 : 140} height={100} className='' />
+                                <img src={src} width={mediaQuery.matches ? 180 : 140} height={100} className='' alt={title}/>
                                 {
                                     tag == "Live auction" ? <div className={styles.tag_image}>{tag}</div> : <div className={`${styles.tag_image} ${styles.hot_sale}`}>{tag}</div>
                                 }
