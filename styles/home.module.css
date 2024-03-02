@@ -1,0 +1,70 @@
+.title {
+    color: #333333;
+    font-weight: 600;
+    font-size: 24px;
+}
+
+.paragragh {
+    color: #4F4F4F;
+}
+
+.ProfileSection p {
+    font-size: 14px;
+}
+
+.border_QR {
+    background-image: linear-gradient(to right, #D20653, #FF951D);
+}
+
+.tag_image {
+    background-color: #D20653;
+    color: #FFFFFF;
+    padding: 9px 23px;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    border-radius: 34% 62% 32% 0% / 100% 0% 100% 0%;
+    font-size: 12px;
+}
+
+.hot_sale {
+    background-color: #FF951D;
+}
+
+@media (max-width: 768px) {
+    .favorite_icon {
+        position: absolute;
+        left: 0px;
+        background-color: white;
+        padding: 5px;
+        border-radius: 50%;
+        margin-left: 5px;
+        margin-top: 5px;
+    }
+
+    .favorite_icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .tag_image {
+        background-color: #D20653;
+        color: #FFFFFF;
+        padding: 3px 8px;
+        position: relative;
+        bottom: 22px;
+        right: -13px;
+        border-radius: 34% 62% 32% 0% / 100% 0% 100% 0%;
+        font-size: 10px;
+        width: 86%;
+    }
+    .arrow_qr{
+        transform: rotate(180deg);
+    }
+    .review_btn{
+        position: absolute;
+        right: 0px;
+        top: 95%;
+        z-index: 1;
+    }    
+}
