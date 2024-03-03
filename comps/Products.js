@@ -10,6 +10,7 @@ import Box from '@mui/material/Box';
 import styles from "../styles/home.module.css";
 
 function CustomTabPanel(props) {
+    
     const { children, value, index, ...other } = props;
 
     return (

@@ -1,31 +1,29 @@
-import React, { useEffect } from 'react';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import React, { useEffect, useState } from 'react';
+import {
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableRow,
+    TextField,
+} from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCategories, fetchCategoriesProperties, fetchModel } from '../features/categoriesSlice';
-import TextField from '@mui/material/TextField';
-
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 
 const Form = () => {
-
-    const [category, setCategory] = React.useState('');
-    const [subcategories, setSubcategories] = React.useState('');
-    const [subCategoriesChange, setSubCategoriesChange] = React.useState('');
-    const [processType, setProcessType] = React.useState('');
-    const [processTypes, setProcessTypes] = React.useState({});
-    const [otherValue, setOtherValue] = React.useState('');
-    const [child, setChild] = React.useState({});
-    const [models, setModels] = React.useState({});
-    const [selectedData, setSelectedData] = React.useState([]);
+    const [category, setCategory] = useState('');
+    const [subcategories, setSubcategories] = useState('');
+    const [subCategoriesChange, setSubCategoriesChange] = useState('');
+    const [properties, setProperties] = useState({});
+    const [otherValue, setOtherValue] = useState('');
+    const [child, setChild] = useState('');
+    const [models, setModels] = useState('');
+    const [selectedData, setSelectedData] = useState([]);
 
     const dispatch = useDispatch();
     const { categorie, property, model, status, error } = useSelector((state) => state.categories);
@@ -34,54 +32,45 @@ const Form = () => {
         if (status === 'idle') {
             dispatch(fetchCategories());
             dispatch(fetchCategoriesProperties());
-            dispatch(fetchModel());
         }
     }, [dispatch, status]);
 
-
     const handleCategoryChange = (event) => {
-        setCategory(event.target.value);
+        const selectedCategoryId = event.target.value;
+        setCategory(selectedCategoryId);
 
-        const selectedCategory = categorie.data?.categories.find(cat => cat.id === event.target.value);
-        console.log(selectedCategory);
+        const selectedCategory = categorie.data?.categories.find(cat => cat.id === selectedCategoryId);
         setSubcategories(selectedCategory ? selectedCategory.children : []);
     };
 
     const handleSubcategoryChange = (event) => {
-        setSubCategoriesChange(event.target.value);
+        const selectedSubcategoryId = event.target.value;
+        setSubCategoriesChange(selectedSubcategoryId);
 
-        const selectedSubCategory = subcategories.find(subcat => subcat.id === event.target.value);
-        console.log(selectedSubCategory);
-        setProcessType(selectedSubCategory ? selectedSubCategory : []);
+        const selectedSubCategory = subcategories.find(subcat => subcat.id === selectedSubcategoryId);
+        setProperties(selectedSubCategory ? selectedSubCategory : '');
     };
 
     const handleProcessTypeChange = (propertyId, event) => {
         const selectedValue = event.target.value;
 
-        setProcessTypes({
-            ...processTypes,
+        setProperties(prevProperties => ({
+            ...prevProperties,
             [propertyId]: selectedValue
-        });
+        }));
 
         if (selectedValue === 'other') {
             setOtherValue('');
-        }
-
-        if (selectedValue === true) {
-            setChild('');
+        } else if (propertyId && property.data && Array.isArray(property.data.options)) {
+            const selectedProperty = property.data.options.find(prop => prop.id === propertyId);
+            if (selectedProperty && selectedProperty.child) {
+                dispatch(fetchModel(selectedValue));
+            }
         }
     };
-
-    // console.log(categorie.data && categorie.data.categories);
-
-    // console.log(model.data);
 
     const handleOtherInputChange = (event) => {
         setOtherValue(event.target.value);
-    };
-
-    const handleChildChange = (event) => {
-        setChild(event.target.value);
     };
 
     const handleModelChange = (event) => {
@@ -91,25 +80,48 @@ const Form = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        // const newDataEntry = {
-        //     name: processTypes.name,
-        //     calories: processTypes.calories,
-        //     fat: processTypes.fat,
-        //     carbs: processTypes.carbs,
-        //     protein: processTypes.protein,
-        // };
+        const selectedCategory = categorie.data.categories.find(cat => cat.id === category);
+        const categoryName = selectedCategory ? selectedCategory.name : '';
 
-        setSelectedData([...selectedData, category]);
+        const selectedSubCategory = subcategories.find(subcat => subcat.id === subCategoriesChange);
+        const subCategoryName = selectedSubCategory ? selectedSubCategory.name : '';
+
+        const optionProperties = {};
+        Object.keys(properties).forEach(propertyId => {
+            const selectedOption = property.data.find(prop => prop.id === parseInt(propertyId));
+            if (selectedOption) {
+                const selectedValue = selectedOption.options.find(opt => opt.id === parseInt(properties[propertyId]));
+                if (selectedValue) {
+                    optionProperties[selectedOption.name] = selectedValue.name;
+                }
+            }
+        });
+
+        const newDataEntry = {
+            category: categoryName,
+            subCategory: subCategoryName,
+            properties: optionProperties,
+            otherValue,
+            models
+        };
+
+        setSelectedData(prevData => [...prevData, newDataEntry]);
+
         setCategory('');
-
+        setSubCategoriesChange('');
+        setProperties({});
+        setOtherValue('');
+        setChild('');
+        setModels('');
     };
 
     return (
         <div className='my-7 flex items-center justify-center'>
             <div>
                 <form onSubmit={handleSubmit}>
+                    {/* Category */}
                     <div className='mt-3'>
-                        <FormControl variant="standard" sx={{ m: 1, minWidth: 350 }}>
+                        <FormControl variant="standard" sx={{ m: 1, minWidth: 550 }}>
                             <InputLabel id="demo-simple-select-standard-label">الفئة</InputLabel>
                             <Select
                                 labelId="demo-simple-select-standard-label"
@@ -125,8 +137,9 @@ const Form = () => {
                         </FormControl>
                     </div>
 
+                    {/* Subcategory */}
                     <div className='mt-3'>
-                        <FormControl variant="standard" sx={{ m: 1, minWidth: 350 }}>
+                        <FormControl variant="standard" sx={{ m: 1, minWidth: 550 }}>
                             <InputLabel id="demo-simple-select-standard-label"> الفئه الفرعيه </InputLabel>
                             <Select
                                 labelId="demo-simple-select-standard-label"
@@ -142,87 +155,78 @@ const Form = () => {
                         </FormControl>
                     </div>
 
+                    {/* Dynamic properties */}
                     <div>
-                        {
-                            subCategoriesChange && property.data && property.data.map(propert => (
-                                <div className='mt-3'>
-                                    <FormControl variant="standard" sx={{ m: 1, minWidth: 350 }} key={propert.id}>
-                                        <InputLabel id="demo-simple-select-standard-label">{propert.name}</InputLabel>
-                                        <Select
-                                            labelId="demo-simple-select-standard-label"
-                                            id="demo-simple-select-standard"
-                                            value={processTypes[propert.id] || ''}
-                                            onChange={(e) => handleProcessTypeChange(propert.id, e)}
-                                            label={propert.name}
-                                        >
-                                            {propert.options && propert.options.map(option => (
-                                                <MenuItem value={option.id} key={option.id}>{option.name}</MenuItem>
-                                            ))}
-                                            <MenuItem value="other">اخري</MenuItem>
-                                        </Select>
-                                        {processTypes[propert.id] === 'other' && (
-                                            <TextField
-                                                id={`other-input-${propert.id}`}
-                                                label={`اكتب ${propert.name}`}
-                                                value={otherValue}
-                                                onChange={handleOtherInputChange}
-                                                sx={{ mt: 3 }}
-                                            />
-                                        )}
-                                    </FormControl>
+                        {subCategoriesChange && property.data && property.data.map(property => (
+                            <div className='mt-3' key={property.id}>
+                                <FormControl variant="standard" sx={{ m: 1, minWidth: 550 }}>
+                                    <InputLabel id={`prop-label-${property.id}`}>{property.name}</InputLabel>
+                                    <Select
+                                        labelId={`prop-label-${property.id}`}
+                                        id={`prop-select-${property.id}`}
+                                        value={properties[property.id] || ''}
+                                        onChange={(e) => handleProcessTypeChange(property.id, e)}
+                                        label={property.name}
+                                    >
+                                        {property.options && property.options.map(option => (
+                                            <MenuItem value={option.id} key={option.id}>{option.name}</MenuItem>
+                                        ))}
+                                        <MenuItem value="other">اخري</MenuItem>
+                                    </Select>
+                                    {properties[property.id] === 'other' && (
+                                        <TextField
+                                            id={`other-input-${property.id}`}
+                                            label={`اكتب ${property.name}`}
+                                            value={otherValue}
+                                            onChange={handleOtherInputChange}
+                                            sx={{ mt: 3 }}
+                                        />)
+                                    }
+                                </FormControl>
 
-                                    {/* {propert.options?.map(opt => (
-                                        opt.child === true ? (
-                                            <FormControl variant="standard" sx={{ m: 1, minWidth: 350 }} key={opt.id}>
-                                                <InputLabel id={`demo-simple-select-model-label`}>Model</InputLabel>
-                                                <Select
-                                                    labelId={`demo-simple-select-model-label`}
-                                                    id={`demo-simple-select-model`}
-                                                    value={models}
-                                                    onChange={handleModelChange}
-                                                    label="Model"
-                                                >
-                                                    {model.data && model.data.map(group => (
-                                                        (group.options && group.options.map(option => (
-                                                            <MenuItem value={option.id} key={option.id}>{option.name}</MenuItem>
-                                                        )))
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
-                                        ) : null
-                                    ))} */}
-                                </div>
-                            ))
-                        }
+                                {/* {property.options?.map(opt => (
+                                    opt.child === true ? (
+                                        <FormControl variant="standard" sx={{ m: 1, minWidth: 550 }} key={opt.id}>
+                                            <InputLabel id={`demo-simple-select-model-label`}>Model</InputLabel>
+                                            <Select
+                                                labelId={`demo-simple-select-model-label`}
+                                                id={`demo-simple-select-model`}
+                                                value={models}
+                                                onChange={handleModelChange}
+                                                label="Model"
+                                            >
+                                                {model.data && model.data.map(group => (
+                                                    (group.options && group.options.map(option => (
+                                                        <MenuItem value={option.id} key={option.id}>{option.name}</MenuItem>
+                                                    )))
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    ) : null
+                                ))} */}
+                            </div>
+                        ))}
                     </div>
 
-                    <button type='submit' className='bg-black text-white p-2 px-5 rounded-lg mt-3'>ارسال</button>
+                    {/* Submit button */}
+                    <button type='submit' className='bg-black text-white p-2 px-5 rounded-lg mt-6'>ارسال</button>
                 </form >
 
+                {/* Display selected data */}
                 <div className='mt-7'>
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 750 }} aria-label="simple table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Key</TableCell>
-                                    <TableCell align="right">Value</TableCell>
-                                </TableRow>
-                            </TableHead>
                             <TableBody>
-                                {/* {selectedData.map((row, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell component="th" scope="row">{row.name}</TableCell>
-                                        <TableCell align="right">{row.calories}</TableCell>
-                                        <TableCell align="right">{row.fat}</TableCell>
-                                        <TableCell align="right">{row.carbs}</TableCell>
-                                        <TableCell align="right">{row.protein}</TableCell>
-                                    </TableRow>
-                                ))} */}
-
                                 {selectedData.map((data, index) => (
-                                    <tr key={index}>
-                                        <td>{data}</td>
-                                    </tr>
+                                    <TableRow key={index}>
+                                        <TableCell>{data.category}</TableCell>
+                                        <TableCell>{data.subCategory}</TableCell>
+                                        {Object.entries(data.properties).map(([propertyName, propertyValue]) => (
+                                            <TableCell key={propertyName}>{propertyValue}</TableCell>
+                                        ))}
+                                        <TableCell>{data.otherValue}</TableCell>
+                                        {/* <TableCell>{data.models}</TableCell> */}
+                                    </TableRow>
                                 ))}
                             </TableBody>
                         </Table>
@@ -233,4 +237,4 @@ const Form = () => {
     )
 }
 
-export default Form
+export default Form;

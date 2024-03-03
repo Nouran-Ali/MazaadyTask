@@ -135,4 +135,7 @@ body {
   .navbar .css-17nauen {
     -webkit-flex-grow: 0 !important;
   }
+  .wrapper {
+    left: 25%;
+  }
 }

@@ -16,7 +16,6 @@ import AdbIcon from '@mui/icons-material/Adb';
 import { useRouter } from 'next/router';
 import styles from "../styles/navbar.module.css";
 import Link from 'next/link';
-// import Image from 'next/image';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import { MainBtn } from "./Buttons";
 import TextField from '@mui/material/TextField';
@@ -58,7 +57,6 @@ function Navbar() {
     setAnchorElUser(null);
   };
 
-  const [active, setActive] = useState()
   const router = useRouter();
 
   const { pathname } = router;
