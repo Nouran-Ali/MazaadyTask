@@ -29,9 +29,9 @@ export const fetchCategories = createAsyncThunk(
 
 export const fetchCategoriesProperties = createAsyncThunk(
     'categories/fetchCategoriesProperties',
-    async (_, { rejectWithValue }) => {
+    async (id, { rejectWithValue }) => {
         try {
-            const response = await fetch('https://staging.mazaady.com/api/v1/properties?cat=13', {
+            const response = await fetch(`https://staging.mazaady.com/api/v1/properties?cat=${id}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'private-key': '3%o8i}_;3D4bF]G5@22r2)Et1&mLJ4?$@+16'
@@ -56,9 +56,9 @@ export const fetchCategoriesProperties = createAsyncThunk(
 
 export const fetchModel = createAsyncThunk(
     'categories/fetchModel',
-    async (_, { rejectWithValue }) => {
+    async (id, { rejectWithValue }) => {
         try {
-            const response = await fetch(`https://staging.mazaady.com/api/v1/get-options-child/53`, {
+            const response = await fetch(`https://staging.mazaady.com/api/v1/get-options-child/${id}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'private-key': '3%o8i}_;3D4bF]G5@22r2)Et1&mLJ4?$@+16'

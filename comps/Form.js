@@ -16,6 +16,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchCategories, fetchCategoriesProperties, fetchModel } from '../features/categoriesSlice';
 
 const Form = () => {
+    const [subCategoryId, setSubCategoryId] = useState('');
     const [category, setCategory] = useState('');
     const [subcategories, setSubcategories] = useState('');
     const [subCategoriesChange, setSubCategoriesChange] = useState('');
@@ -31,14 +32,20 @@ const Form = () => {
     useEffect(() => {
         if (status === 'idle') {
             dispatch(fetchCategories());
-            dispatch(fetchCategoriesProperties());
         }
+
     }, [dispatch, status]);
+
+    useEffect(() => {
+        if (subCategoryId) {
+            dispatch(fetchCategoriesProperties(subCategoryId));
+        }
+
+    }, [dispatch, subCategoryId]);
 
     const handleCategoryChange = (event) => {
         const selectedCategoryId = event.target.value;
         setCategory(selectedCategoryId);
-
         const selectedCategory = categorie.data?.categories.find(cat => cat.id === selectedCategoryId);
         setSubcategories(selectedCategory ? selectedCategory.children : []);
     };
@@ -46,7 +53,7 @@ const Form = () => {
     const handleSubcategoryChange = (event) => {
         const selectedSubcategoryId = event.target.value;
         setSubCategoriesChange(selectedSubcategoryId);
-
+        setSubCategoryId(selectedSubcategoryId)
         const selectedSubCategory = subcategories.find(subcat => subcat.id === selectedSubcategoryId);
         setProperties(selectedSubCategory ? selectedSubCategory : '');
     };
@@ -87,15 +94,15 @@ const Form = () => {
         const subCategoryName = selectedSubCategory ? selectedSubCategory.name : '';
 
         const optionProperties = {};
-        Object.keys(properties).forEach(propertyId => {
-            const selectedOption = property.data.find(prop => prop.id === parseInt(propertyId));
-            if (selectedOption) {
-                const selectedValue = selectedOption.options.find(opt => opt.id === parseInt(properties[propertyId]));
-                if (selectedValue) {
-                    optionProperties[selectedOption.name] = selectedValue.name;
-                }
-            }
-        });
+        // Object.keys(properties).forEach(propertyId => {
+        //     const selectedOption = property.data.find(prop => prop.id === parseInt(propertyId));
+        //     if (selectedOption) {
+        //         const selectedValue = selectedOption.options.find(opt => opt.id === parseInt(properties[propertyId]));
+        //         if (selectedValue) {
+        //             optionProperties[selectedOption.name] = selectedValue.name;
+        //         }
+        //     }
+        // });
 
         const newDataEntry = {
             category: categoryName,
